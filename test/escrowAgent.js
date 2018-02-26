@@ -57,9 +57,9 @@ contract('given an escrow agent contract', function(accounts) {
     })
 
     describe('when an escrow is approved', function() {
-        let escrowHash
-
         describe('that exists', function() {
+            let escrowHash
+
             beforeEach('create an escrow', async function() {
                 const transactionHash = await escrowAgent.createEscrow(seller, buyer, {from: buyer, value: web3.toWei(0.01, "ether")})
                 escrowHash = transactionHash.logs[0].args.escrowHash
@@ -77,6 +77,12 @@ contract('given an escrow agent contract', function(accounts) {
                     let transactionHash = await escrowAgent.approve(escrowHash, {from: buyer})
 
                     assert.equal(transactionHash.logs[0].event, "BuyerApproved")
+                })
+
+                it('then emit BuyerApproved event with the escrow hash', async function() {
+                    let transactionHash = await escrowAgent.approve(escrowHash, {from: buyer})
+
+                    assert.equal(escrowHash, transactionHash.logs[0].args.escrowHash)
                 })
 
                 it('then emit BuyerApproved event with the buyers address', async function() {
@@ -100,6 +106,12 @@ contract('given an escrow agent contract', function(accounts) {
                     let transactionHash = await escrowAgent.approve(escrowHash, {from: seller})
 
                     assert.equal(transactionHash.logs[0].event, "SellerApproved")
+                })
+
+                it('then emit SellerApproved event with the escrow hash', async function() {
+                    let transactionHash = await escrowAgent.approve(escrowHash, {from: seller})
+
+                    assert.equal(escrowHash, transactionHash.logs[0].args.escrowHash)
                 })
 
                 it('then emit SellerApproved event with the sellers address', async function() {
@@ -160,10 +172,63 @@ contract('given an escrow agent contract', function(accounts) {
         describe('that does not exist', function() {
             it('then it should error', async function() {
                 try {
-                    await escrowAgent.approve(escrowHash, {from: accounts[5]})
+                    await escrowAgent.approve(0, {from: accounts[5]})
                 } catch (error) {
                     assert.equal(error.name, "StatusError")
                 }
+            })
+        })
+    })
+
+    describe('when an escrow is disputed', function() {
+
+        describe('that exists', function() {
+            let escrowHash;
+
+            beforeEach('create an escrow', async function() {
+                const transactionHash = await escrowAgent.createEscrow(seller, buyer, {from: buyer, value: web3.toWei(0.01, "ether")})
+                escrowHash = transactionHash.logs[0].args.escrowHash
+            })
+
+            describe('by the buyer or seller', function() {
+                it('then emit event with the escrow hash', async function() {
+                    let transactionHash = await escrowAgent.dispute(escrowHash, {from: buyer})
+
+                    assert.equal(transactionHash.logs[0].args.escrowHash, escrowHash)
+                })
+
+                it('then emit event with the address of the disputer', async function() {
+                    let transactionHash = await escrowAgent.dispute(escrowHash, {from: buyer})
+
+                    assert.equal(transactionHash.logs[0].args.disputedBy, buyer)
+                })
+
+                it('then set isDisputed to true', async function() {
+                    await escrowAgent.dispute(escrowHash, {from: buyer})
+
+                    const escrow = await escrowAgent.escrows.call(escrowHash)
+                    assert.isTrue(escrow[6])
+                })
+            })
+
+            describe('by an unauthorized address', function() {
+                it('then it should error', async function() {
+                    try {
+                        await escrowAgent.dispute(escrowHash, {from: accounts[5]})
+                    } catch (error) {
+                        assert.equal(error.name, "StatusError")
+                    }
+                })
+
+                it('then isDisputed should still be false', async function() {
+                    try {
+                        await escrowAgent.dispute(escrowHash, {from: accounts[5]})
+                    } catch (error) {
+                    }
+
+                    const escrow = await escrowAgent.escrows.call(escrowHash)
+                    assert.isFalse(escrow[6])
+                })
             })
         })
     })
