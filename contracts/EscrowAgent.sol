@@ -21,6 +21,7 @@ contract EscrowAgent {
         bool isSellerApproved;
         bool isDisputed;
     }
+
     mapping (bytes32 => Escrow) public escrows;
 
     modifier onlyArbitrator() {
