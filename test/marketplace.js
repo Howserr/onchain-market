@@ -1,4 +1,5 @@
 const Marketplace = artifacts.require('./Marketplace.sol')
+const EscrowAgentMock = artifacts.require('./EscrowAgentMock.sol')
 
 contract('given a marketplace contract', function(accounts) {
     let marketplace
@@ -7,7 +8,8 @@ contract('given a marketplace contract', function(accounts) {
     let buyer = accounts[2]
 
     beforeEach('setup a new contract', async function() {
-        marketplace = await Marketplace.new()
+        let escrowAgentMock = await EscrowAgentMock.new()
+        marketplace = await Marketplace.new(escrowAgentMock.address)
     })
 
     describe('when a listing is created', async function() {
