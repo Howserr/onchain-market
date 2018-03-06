@@ -6,6 +6,7 @@ contract Marketplace {
     address escrowAgent;
 
     event Created(bytes32 listingHash);
+    event ListingPurchased(bytes32 listingHash);
 
     struct Listing {
         bool active;
@@ -33,10 +34,9 @@ contract Marketplace {
         Listing storage listing = listings[listingHash];
         require(listing.active);
         require(msg.value == listing.price);
-        // How do we contact the escrow contract?
-        // mark listing as inactive
-        // create escrow with the funds sent to this method
-        // return the created escrow hash
-        // broadcast event to inform seller that item has been requested and escrow created/funded
+        escrowHash = escrowAgent.createEscrow.value(msg.value)(listing.seller, msg.sender);
+        listing.active = false;
+        ListingPurchased(listingHash);
+        return escrowHash;
     }
 }
