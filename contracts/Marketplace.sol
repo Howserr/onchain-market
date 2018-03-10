@@ -63,9 +63,9 @@ contract Marketplace {
         return listingIndex.length;
     }
 
-    function addListing(string name) public returns (bytes32 listingHash){
-        listingHash = keccak256(msg.sender, name, 10, now);
-        insertListing(listingHash, msg.sender, name, 10);
+    function addListing(string name, uint price) public returns (bytes32 listingHash){
+        listingHash = keccak256(msg.sender, name, price, now);
+        insertListing(listingHash, msg.sender, name, price);
         return listingHash;
     }
 

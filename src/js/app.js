@@ -95,6 +95,19 @@ App = {
 
 			App.waitAndRefresh(count);
 		})
+	},
+
+	createListing: function () {
+		let listingName = document.getElementById("listingName").value
+		let listingPrice = web3.toWei(parseFloat(document.getElementById("listingPrice").value), "ether")
+		console.log("Setting name to: " + listingName)
+		console.log("Setting price to: " + listingPrice)
+
+		App.contracts.Marketplace.deployed().then(function (instance) {
+			return instance.addListing(listingName, listingPrice, {from: App.account})
+		}).then(function (result) {
+			console.log(result)
+		})
 	}
 }
 

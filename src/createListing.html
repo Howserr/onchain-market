@@ -23,31 +23,19 @@
         <div class="inner">
             <h3 class="masthead-brand">Cover</h3>
             <nav class="nav nav-masthead justify-content-center">
-                <a class="nav-link active" href="#">Listings</a>
-                <a class="nav-link" href="createListing.html">Create Listing</a>
+                <a class="nav-link" href="index.html">Listings</a>
+                <a class="nav-link active" href="#">Create Listing</a>
             </nav>
         </div>
     </header>
 
     <main role="main" class="inner cover">
-        <div class="row" id="listingRow">
-            <div class="col-md-1"></div>
-            <div class="col-md-10">
-                <div id="listingSection">
-                    <h1>Currently Listed</h1>
-                </div>
-
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Price</th>
-                    </tr>
-                    </thead>
-                    <tbody id="userListings"></tbody>
-                </table>
-            </div>
-        </div>
+        <h1>Create Listing</h1>
+        <table class="listingDetails">
+            <tr><td class="listingLabel"><label for="listingName">Listing Name:</label></td><td><input type="text" id="listingName" placeholder="eg Shoes"></input></td></tr>
+            <tr><td class="listingLabel"><label for="listingPrice">Price in Ether:</label></td><td><input type="text" id="listingPrice" placeholder="eg 3.0"></input></td></tr>
+            <tr><td class="listingLabel">&nbsp;</td><td><button id="createListing" onclick="App.createListing()">Create Listing</button></td></tr>
+        </table>
     </main>
 
     <footer class="mastfoot mt-auto">
