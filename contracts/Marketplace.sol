@@ -1,41 +1,81 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.19;
+
+import "./EscrowAgent.sol";
 
 contract Marketplace {
 
     address owner;
-    address escrowAgent;
+    address escrowAgentAddress;
 
     event Created(bytes32 listingHash);
     event ListingPurchased(bytes32 listingHash);
 
     struct Listing {
-        bool active;
+        bool available;
         address seller;
         string name;
         uint price;
+        uint index;
     }
 
-    mapping (bytes32 => Listing) public listings;
+    mapping (bytes32 => Listing) private listings;
+    bytes32[] private listingIndex;
 
     function Marketplace(address escrowAddress) public {
         owner = msg.sender;
-        escrowAgent = escrowAddress;
+        escrowAgentAddress = escrowAddress;
+
+        insertListing(keccak256(msg.sender, "listing 1", 1, now), msg.sender, "listing 1", 1 ether);
+        insertListing(keccak256(msg.sender, "listing 2", 2, now), msg.sender, "listing 2", 2 ether);
+        insertListing(keccak256(msg.sender, "listing 3", 3, now), msg.sender, "listing 3", 3 ether);
+        listings[listingIndex[2]].available = false;
     }
 
-    function addListing(string name, uint price) public returns (bytes32 listingHash){
-        listingHash = keccak256(msg.sender, name, price, now);
-        require(!listings[listingHash].active);
-        listings[listingHash] = Listing(true, msg.sender, name, price);
+    function isListing(bytes32 listingHash) public view returns (bool isIndeed) {
+        if (listingIndex.length == 0) {
+            return false;
+        }
+        return (listingIndex[listings[listingHash].index] == listingHash);
+    }
+
+    function insertListing(bytes32 listingHash, address seller, string name, uint price) private returns (uint index) {
+        require(!isListing(listingHash));
+
+        listings[listingHash].available = true;
+        listings[listingHash].seller = seller;
+        listings[listingHash].name = name;
+        listings[listingHash].price = price;
+        listings[listingHash].index = listingIndex.push(listingHash) - 1;
         Created(listingHash);
+        return listingIndex.length - 1;
+    }
+
+    function getListingAtIndex(uint index) public view returns (bytes32 listingHash) {
+        return listingIndex[index];
+    }
+
+    function getListing(bytes32 listingHash) public view returns (bool available, address seller, string name, uint price, uint index) {
+        require(isListing(listingHash));
+        return(listings[listingHash].available, listings[listingHash].seller, listings[listingHash].name, listings[listingHash].price, listings[listingHash].index);
+    }
+
+    function getListingCount() public view returns (uint count) {
+        return listingIndex.length;
+    }
+
+    function addListing(string name) public returns (bytes32 listingHash){
+        listingHash = keccak256(msg.sender, name, 10, now);
+        insertListing(listingHash, msg.sender, name, 10);
         return listingHash;
     }
 
     function purchaseListing(bytes32 listingHash) payable public returns (bytes32 escrowHash) {
+        require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
-        require(listing.active);
         require(msg.value == listing.price);
+        EscrowAgent escrowAgent = EscrowAgent(escrowAgentAddress);
         escrowHash = escrowAgent.createEscrow.value(msg.value)(listing.seller, msg.sender);
-        listing.active = false;
+        listing.available = false;
         ListingPurchased(listingHash);
         return escrowHash;
     }
