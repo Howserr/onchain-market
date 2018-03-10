@@ -14,18 +14,28 @@ App = {
 			// Set the provider for our contract
 			App.contracts.Marketplace.setProvider(App.web3Provider);
 
-			web3.eth.getAccounts(function (err, accounts) {
-				if (err != null) {
-					alert("There was an error fetching your accounts.");
-					return;
-				}
-				App.accounts = accounts
-				App.account = accounts[0]
-			})
 
+			$("#right-column").load("rightPanel.html", function() {
+				web3.eth.getAccounts(function (err, accounts) {
+					if (err != null) {
+						alert("There was an error fetching your accounts.");
+						return;
+					}
+
+					if (accounts.length == 0) {
+						alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
+						return;
+					}
+
+					App.accounts = accounts
+					App.account = accounts[0]
+
+					App.updateEthNetworkInfo();
+				})
+			})
 			App.updateListings();
+			App.refreshListing()
 		})
-		App.bindEvents();
 	},
 
 	initWeb3: function () {
@@ -38,8 +48,31 @@ App = {
 		web3 = new Web3(App.web3Provider);
 	},
 
-	bindEvents: function () {
-		//$(document).on('click', '.btn-adopt', App.handlePurchase);
+	updateEthNetworkInfo: function() {
+		let address = document.getElementById("address");
+		address.innerHTML = App.account.toString();
+
+		let ethBalance = document.getElementById("ethBalance");
+		web3.eth.getBalance(App.account, function(err, bal) {
+			ethBalance.innerHTML = web3.fromWei(bal, "ether") + " ETH";
+		});
+
+
+		let network = document.getElementById("network");
+		web3.version.getNetwork(function(err, net) {
+			let networkDisplay;
+
+			if(net == 1) {
+				networkDisplay = "Ethereum MainNet";
+			} else if (net == 2) {
+				networkDisplay = "Morden TestNet";
+			} else if (net == 3) {
+				networkDisplay = "Ropsten TestNet";
+			} else {
+				networkDisplay = net;
+			}
+			network.innerHTML = networkDisplay;
+		});
 	},
 
 	waitAndRefresh: function (count) {
@@ -112,15 +145,13 @@ App = {
 		let listingIndex = getParameterByName("listingIndex")
 		App.contracts.Marketplace.deployed().then(function (instance) {
 			marketplaceInstance = instance;
-			console.log("hello 2");
-			return marketplaceInstance.getListingAtIndex.call(listingIndex)
+			return marketplaceInstance.getListingAtIndex.call(parseInt(listingIndex))
 		}).then(function (listingHash) {
-			console.log("hello 1");
 			return marketplaceInstance.getListing.call(listingHash)
 		}).then(function (listing) {
 			console.log(listing)
 			$("#listingTitle").text(listing[2])
-			let listingContainer = document.getElementById("listingContainer")
+			let listingDetails = document.getElementById("listingDetails")
 			let res = "";
 			res = res + "<tr>";
 			res = res + "<td>" + listing[0] + "</a></td>"
@@ -130,16 +161,14 @@ App = {
 			res = res + "</tr>";
 
 			console.log("Refreshing listing");
-			listingContainer.innerHTML = res;
+			listingDetails.innerHTML = res;
 		})
-
-
 	}
 }
 
 $(function () {
 	$(window).on("load", function () {
-		App.init();
+		App.init()
 	});
 });
 

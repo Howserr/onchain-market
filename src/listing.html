@@ -18,10 +18,10 @@
 
 <body class="text-center">
 
-<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+<div class="cover-container container-fluid d-flex p-3 flex-column">
     <header class="masthead mb-auto">
         <div class="inner">
-            <h3 class="masthead-brand">Cover</h3>
+            <h3 class="masthead-brand">On-Chain Market</h3>
             <nav class="nav nav-masthead justify-content-center">
                 <a class="nav-link" href="index.html">Listings</a>
                 <a class="nav-link active" href="createListing.html">Create Listing</a>
@@ -30,16 +30,22 @@
     </header>
 
     <main role="main" class="inner cover">
-        <h1>Listing</h1>
+        <h1>Listing Details</h1>
         <div class="row">
-            <div class="col-md-8">
-
-                <h1>Listing</h1>
-                <h2>Auction for <span id="listingTitle"></span></h2>
-
-                <div id="listingContainer"></div>
+            <div class="col-md-12">
+                <h2><span id="listingTitle"></span></h2>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Available</th>
+                        <th>Seller</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                    </thead>
+                    <tbody id="listingDetails"></tbody>
+                </table>
             </div>
-
             <div class="col-md-4">
                 <div id="right-column"></div>
             </div>
