@@ -33,7 +33,7 @@ App = {
 			App.web3Provider = web3.currentProvider;
 		} else {
 			// If no injected web3 instance is detected, fall back to Ganache
-			App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+			App.web3Provider = new Web3.providers.HttpProvider('http://localhost:8545');
 		}
 		web3 = new Web3(App.web3Provider);
 	},
@@ -58,7 +58,7 @@ App = {
 					res = res + "</tr>";
 				}
 			}
-			console.log("Refreshing auctions!");
+			console.log("Refreshing listings!");
 			listingSection.innerHTML = res;
 		}
 	},
@@ -82,7 +82,6 @@ App = {
 			return instance.getListingCount.call()
 		}).then(function (count) {
 			console.log("Contract has this many listings " + count);
-
 			if (count <= 0) {
 				console.log("No listings found")
 			}
@@ -90,9 +89,8 @@ App = {
 			App.listings = []
 
 			for (let i = 0; i < count; i++) {
-				App.getListing(i);
+				App.getListing(i)
 			}
-
 			App.waitAndRefresh(count);
 		})
 	},
@@ -108,6 +106,34 @@ App = {
 		}).then(function (result) {
 			console.log(result)
 		})
+	},
+
+	refreshListing: function () {
+		let listingIndex = getParameterByName("listingIndex")
+		App.contracts.Marketplace.deployed().then(function (instance) {
+			marketplaceInstance = instance;
+			console.log("hello 2");
+			return marketplaceInstance.getListingAtIndex.call(listingIndex)
+		}).then(function (listingHash) {
+			console.log("hello 1");
+			return marketplaceInstance.getListing.call(listingHash)
+		}).then(function (listing) {
+			console.log(listing)
+			$("#listingTitle").text(listing[2])
+			let listingContainer = document.getElementById("listingContainer")
+			let res = "";
+			res = res + "<tr>";
+			res = res + "<td>" + listing[0] + "</a></td>"
+			res = res + "<td>" + listing[1] + "</a></td>"
+			res = res + "<td>" + listing[2] + "</a></td>"
+			res = res + "<td>" + web3.fromWei(listing[3], "ether") + " ETH" + "</td>";
+			res = res + "</tr>";
+
+			console.log("Refreshing listing");
+			listingContainer.innerHTML = res;
+		})
+
+
 	}
 }
 
@@ -116,3 +142,13 @@ $(function () {
 		App.init();
 	});
 });
+
+function getParameterByName(name, url) {
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, "\\$&");
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+		results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
