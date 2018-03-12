@@ -24,18 +24,32 @@
             <h3 class="masthead-brand">On-Chain Market</h3>
             <nav class="nav nav-masthead justify-content-center">
                 <a class="nav-link" href="index.html">Listings</a>
-                <a class="nav-link active" href="#">Create Listing</a>
+                <a class="nav-link active" href="#">My Listings</a>
             </nav>
         </div>
     </header>
 
     <main role="main" class="inner cover">
+        <h1>My Listings</h1>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Available</th>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+            <tbody id="userListings"></tbody>
+        </table>
         <h1>Create Listing</h1>
         <table class="listingDetails">
             <tr><td class="listingLabel"><label for="listingName">Listing Name:</label></td><td><input type="text" id="listingName" placeholder="eg Shoes"></input></td></tr>
             <tr><td class="listingLabel"><label for="listingPrice">Price in Ether:</label></td><td><input type="text" id="listingPrice" placeholder="eg 3.0"></input></td></tr>
             <tr><td class="listingLabel">&nbsp;</td><td><button id="createListing" onclick="App.createListing()">Create Listing</button></td></tr>
         </table>
+        <div class="col-md-4">
+            <div id="right-column"></div>
+        </div>
     </main>
 
     <footer class="mastfoot mt-auto">

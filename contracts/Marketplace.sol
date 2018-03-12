@@ -22,6 +22,8 @@ contract Marketplace {
     mapping (bytes32 => Listing) private listings;
     bytes32[] private listingIndex;
 
+    mapping(address => uint[]) private listingsByUser;
+
     function Marketplace(address escrowAddress) public {
         owner = msg.sender;
         escrowAgentAddress = escrowAddress;
@@ -49,6 +51,9 @@ contract Marketplace {
         listing.price = price;
         listing.index = listingIndex.push(listingHash) - 1;
         CreatedListing(listingHash);
+
+        listingsByUser[seller].push(listing.index);
+
         return listingIndex.length - 1;
     }
 
@@ -65,6 +70,14 @@ contract Marketplace {
 
     function getListingCount() public view returns (uint count) {
         return listingIndex.length;
+    }
+
+    function getUserListingCount(address user) public view returns (uint count) {
+        return listingsByUser[user].length;
+    }
+
+    function getListingIndexForUserByIndex(address user, uint index) returns (uint listingIndex) {
+        return listingsByUser[user][index];
     }
 
     function addListing(string name, uint price) public returns (bytes32 listingHash){

@@ -24,7 +24,7 @@
             <h3 class="masthead-brand">On-Chain Market</h3>
             <nav class="nav nav-masthead justify-content-center">
                 <a class="nav-link active" href="#">Listings</a>
-                <a class="nav-link" href="createListing.html">Create Listing</a>
+                <a class="nav-link" href="myListings.html">My Listings</a>
             </nav>
         </div>
     </header>
@@ -32,7 +32,7 @@
     <main role="main" class="inner cover">
         <div class="row" id="listingRow">
             <div class="col-md-1"></div>
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <div id="listingSection">
                     <h1>Currently Listed</h1>
                 </div>
@@ -44,9 +44,12 @@
                         <th>Price</th>
                     </tr>
                     </thead>
-                    <tbody id="userListings"></tbody>
+                    <tbody id="marketListings"></tbody>
                 </table>
             </div>
+        </div>
+        <div class="col-md-4">
+            <div id="right-column"></div>
         </div>
     </main>
 

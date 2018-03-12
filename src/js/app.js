@@ -4,6 +4,7 @@ App = {
 	accounts: [],
 	account: 0,
 	listings: [],
+	userListings: [],
 
 	init: async function () {
 		await App.initWeb3();
@@ -37,6 +38,7 @@ App = {
 				})
 			})
 			App.updateListings()
+			App.updateUserListings()
 			App.refreshListing()
 		})
 	},
@@ -83,7 +85,7 @@ App = {
 			console.log("sleeping");
 			setTimeout(App.waitAndRefresh, 500, count)
 		} else {
-			let listingSection = document.getElementById("userListings")
+			let listingSection = document.getElementById("marketListings")
 			let res = "";
 			for (let i = 0; i < count; i++) {
 				let listing = App.listings[i]
@@ -94,7 +96,7 @@ App = {
 					res = res + "</tr>";
 				}
 			}
-			console.log("Refreshing listings!");
+			console.log("Refreshing market listings!");
 			listingSection.innerHTML = res;
 		}
 	},
@@ -128,6 +130,62 @@ App = {
 				App.getListing(i)
 			}
 			App.waitAndRefresh(count);
+		})
+	},
+
+	waitAndRefreshUser: function (count) {
+		if (App.userListings.length < count) {
+			console.log("sleeping");
+			setTimeout(App.waitAndRefreshUser, 500, count)
+		} else {
+			let listingSection = document.getElementById("userListings")
+			let res = "";
+			for (let i = 0; i < count; i++) {
+				let listing = App.userListings[i]
+				res = res + "<tr>"
+				res = res + "<td>" + listing[0] + "</td>"
+				res = res + "<td><a href='listing.html?listingIndex=" + listing[4] + "'>" + listing[2] + "</a></td>"
+				res = res + "<td>" + web3.fromWei(listing[3], "ether") + " ETH" + "</td>"
+				res = res + "</tr>"
+			}
+			console.log("Refreshing user listings!");
+			listingSection.innerHTML = res;
+		}
+	},
+
+	getUserListing: function (listingIndex) {
+		let marketplaceInstance;
+		console.log("loading: " + listingIndex)
+		App.contracts.Marketplace.deployed().then(function (instance) {
+			marketplaceInstance = instance;
+			return marketplaceInstance.getListingAtIndex.call(listingIndex)
+		}).then(function (listingHash) {
+			return marketplaceInstance.getListing.call(listingHash)
+		}).then(function (listing) {
+			console.log(listing)
+			App.userListings.push(listing)
+		})
+	},
+
+	updateUserListings: function () {
+		let marketplaceInstance
+		App.contracts.Marketplace.deployed().then(function (instance) {
+			marketplaceInstance = instance
+			return marketplaceInstance.getUserListingCount.call(App.account)
+		}).then(function (count) {
+			console.log("User has this many listings " + count);
+			if (count <= 0) {
+				console.log("No listings found for user")
+			}
+
+			App.userListings = []
+
+			for (let i = 0; i < count; i++) {
+				marketplaceInstance.getListingIndexForUserByIndex.call(App.account, i).then(function (listingIndex) {
+					App.getUserListing(listingIndex)
+				})
+			}
+			App.waitAndRefreshUser(count);
 		})
 	},
 
@@ -169,10 +227,9 @@ App = {
 			console.log("Refreshing listing");
 			listingDetails.innerHTML = res;
 
-			if (!listing[0]) {
+			if (!listing[0] || App.account == listing[1]) {
 				$("#purchaseListing").hide()
 			}
-			console.log(listing[5])
 
 			if (listing[5] != 0x0000000000000000000000000000000000000000000000000000000000000000) {
 				App.contracts.EscrowAgent.deployed().then(function (instance) {
@@ -225,7 +282,7 @@ App = {
 			listingHash = returnedListingHash
 			return marketplaceInstance.getListing.call(listingHash)
 		}).then(function (listing) {
-			return marketplaceInstance.purchaseListing(listingHash, {from: App.account, value: listing[3]})
+			return marketplaceInstance.purchaseListing(listingHash, {value: listing[3]})
 		}).then(function (transactionHash) {
 			console.log(transactionHash)
 			App.refreshListing()
@@ -247,7 +304,7 @@ App = {
 			escrowHash = listing[5]
 			return App.contracts.EscrowAgent.deployed()
 		}).then(function (instance) {
-			instance.approve(escrowHash, {from: App.account})
+			instance.approve(escrowHash)
 		}).then(function (transactionHash) {
 			console.log(transactionHash)
 			App.refreshListing()
