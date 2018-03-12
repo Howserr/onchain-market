@@ -20,9 +20,11 @@ contract EscrowAgent {
         bool isBuyerApproved;
         bool isSellerApproved;
         bool isDisputed;
+        uint index;
     }
 
     mapping (bytes32 => Escrow) public escrows;
+    bytes32[] private escrowIndex;
 
     modifier onlyArbitrator() {
         require(msg.sender == arbitrator);
@@ -34,11 +36,43 @@ contract EscrowAgent {
         arbitrator = msg.sender;
     }
 
+    function isEscrow(bytes32 escrowHash) public view returns (bool isIndeed) {
+        if (escrowIndex.length == 0) {
+            return false;
+        }
+        return (escrowIndex[escrows[escrowHash].index] == escrowHash);
+    }
+
+    function insertEscrow(bytes32 escrowHash, address seller, address buyer, uint balance) private returns (uint index) {
+        require(!isEscrow(escrowHash));
+
+        Escrow storage escrow = escrows[escrowHash];
+        escrow.active = true;
+        escrow.seller = seller;
+        escrow.buyer = buyer;
+        escrow.balance = balance;
+        escrow.isBuyerApproved = false;
+        escrow.isSellerApproved = false;
+        escrow.isDisputed = false;
+        escrow.index = escrowIndex.push(escrowHash) - 1;
+        CreatedEscrow(escrowHash);
+        return escrowIndex.length - 1;
+    }
+
+    function getEscrowAtIndex(uint index) public view returns (bytes32 escrowHash) {
+        require(index < escrowIndex.length);
+        return escrowIndex[index];
+    }
+
+    function getEscrow(bytes32 escrowHash) public view returns (bool active, address seller, address buyer, uint balance, bool isBuyerApproved, bool isSellerApproved, bool isDisputed, uint index) {
+        require(isEscrow(escrowHash));
+        Escrow storage escrow = escrows[escrowHash];
+        return(escrow.active, escrow.seller, escrow.buyer, escrow.balance, escrow.isBuyerApproved, escrow.isSellerApproved, escrow.isDisputed, escrow.index);
+    }
+
     function createEscrow(address seller, address buyer) payable external returns (bytes32 escrowHash) {
         escrowHash = keccak256(seller, buyer, msg.value, now);
-        require(!escrows[escrowHash].active);
-        escrows[escrowHash] = Escrow(true, seller, buyer, msg.value, false, false, false);
-        CreatedEscrow(escrowHash);
+        insertEscrow(escrowHash, seller, buyer, msg.value);
         return escrowHash;
     }
 

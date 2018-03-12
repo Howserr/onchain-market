@@ -9,31 +9,34 @@ App = {
 		await App.initWeb3();
 		$.getJSON('Marketplace.json').then(function (data) {
 			let MarketplaceArtifact = data;
-			App.contracts.Marketplace = TruffleContract(MarketplaceArtifact);
+			App.contracts.Marketplace = TruffleContract(MarketplaceArtifact)
+			App.contracts.Marketplace.setProvider(App.web3Provider)
 
-			// Set the provider for our contract
-			App.contracts.Marketplace.setProvider(App.web3Provider);
-
+			return $.getJSON('EscrowAgent.json')
+		}).then(function (data) {
+			let EscrowAgentArtifact = data;
+			App.contracts.EscrowAgent = TruffleContract(EscrowAgentArtifact)
+			App.contracts.EscrowAgent.setProvider(App.web3Provider)
 
 			$("#right-column").load("rightPanel.html", function() {
 				web3.eth.getAccounts(function (err, accounts) {
 					if (err != null) {
-						alert("There was an error fetching your accounts.");
-						return;
+						alert("There was an error fetching your accounts.")
+						return
 					}
 
 					if (accounts.length == 0) {
-						alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
-						return;
+						alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.")
+						return
 					}
 
 					App.accounts = accounts
 					App.account = accounts[0]
 
-					App.updateEthNetworkInfo();
+					App.updateEthNetworkInfo()
 				})
 			})
-			App.updateListings();
+			App.updateListings()
 			App.refreshListing()
 		})
 	},
@@ -166,14 +169,15 @@ App = {
 			console.log("Refreshing listing");
 			listingDetails.innerHTML = res;
 
-			if (listing[0] == false) {
+			if (!listing[0]) {
 				$("#purchaseListing").hide()
 			}
 			console.log(listing[5])
 
 			if (listing[5] != 0x0000000000000000000000000000000000000000000000000000000000000000) {
-				console.log("hello")
-				marketplaceInstance.getListingEscrow.call(listingHash).then(function (escrow) {
+				App.contracts.EscrowAgent.deployed().then(function (instance) {
+					return instance.getEscrow.call(listing[5])
+				}).then(function (escrow) {
 					console.log(escrow)
 
 					$("#escrowTable").show()
@@ -189,8 +193,22 @@ App = {
 					res = res + "<td>" + escrow[5] + "</a></td>"
 					res = res + "<td>" + escrow[6] + "</a></td>"
 					res = res + "</tr>";
-
 					escrowDetails.innerHTML = res;
+
+					// if escrow is active
+					if (escrow[0]) {
+						// if not isBuyerApproved
+						if (!escrow[4] && App.account == escrow[2]) {
+							$("#approveEscrow").show()
+						}
+						// if not isSellerApproved
+						if (!escrow[5] && App.account == escrow[1]) {
+							$("#approveEscrow").show()
+						}
+						if (!escrow[6]) {
+							$("#disputeEscrow").show()
+						}
+					}
 				})
 			}
 		})
@@ -210,9 +228,53 @@ App = {
 			return marketplaceInstance.purchaseListing(listingHash, {from: App.account, value: listing[3]})
 		}).then(function (transactionHash) {
 			console.log(transactionHash)
+			App.refreshListing()
 		})
 	},
 
+	approveEscrow: function () {
+		let marketplaceInstance
+		let listingIndex = getParameterByName("listingIndex")
+		let listingHash
+		let escrowHash
+		App.contracts.Marketplace.deployed().then(function (instance) {
+			marketplaceInstance = instance;
+			return marketplaceInstance.getListingAtIndex.call(parseInt(listingIndex))
+		}).then(function (returnedListingHash) {
+			listingHash = returnedListingHash
+			return marketplaceInstance.getListing.call(listingHash)
+		}).then(function (listing) {
+			escrowHash = listing[5]
+			return App.contracts.EscrowAgent.deployed()
+		}).then(function (instance) {
+			instance.approve(escrowHash, {from: App.account})
+		}).then(function (transactionHash) {
+			console.log(transactionHash)
+			App.refreshListing()
+		})
+	},
+
+	disputeEscrow: function () {
+		let marketplaceInstance
+		let listingIndex = getParameterByName("listingIndex")
+		let listingHash
+		let escrowHash
+		App.contracts.Marketplace.deployed().then(function (instance) {
+			marketplaceInstance = instance;
+			return marketplaceInstance.getListingAtIndex.call(parseInt(listingIndex))
+		}).then(function (returnedListingHash) {
+			listingHash = returnedListingHash
+			return marketplaceInstance.getListing.call(listingHash)
+		}).then(function (listing) {
+			escrowHash = listing[5]
+			return App.contracts.EscrowAgent.deployed()
+		}).then(function (instance) {
+			instance.dispute(escrowHash, {from: App.account})
+		}).then(function (transactionHash) {
+			console.log(transactionHash)
+			App.refreshListing()
+		})
+	},
 
 	setStatus: function (message, category) {
 		var status = document.getElementById("statusMessage");

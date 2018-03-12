@@ -24,7 +24,7 @@
             <h3 class="masthead-brand">On-Chain Market</h3>
             <nav class="nav nav-masthead justify-content-center">
                 <a class="nav-link" href="index.html">Listings</a>
-                <a class="nav-link active" href="createListing.html">Create Listing</a>
+                <a class="nav-link" href="createListing.html">Create Listing</a>
             </nav>
         </div>
     </header>
@@ -61,6 +61,8 @@
                     </thead>
                     <tbody id="escrowDetails"></tbody>
                 </table>
+                <button id="approveEscrow" onclick="App.approveEscrow()" style="display:none">Approve Escrow</button>
+                <button id="disputeEscrow" onclick="App.disputeEscrow()" style="display:none">Dispute Escrow</button>
             </div>
             <div class="col-md-4">
                 <div id="right-column"></div>
