@@ -142,11 +142,14 @@ App = {
 	},
 
 	refreshListing: function () {
+		let marketplaceInstance
 		let listingIndex = getParameterByName("listingIndex")
+		let listingHash
 		App.contracts.Marketplace.deployed().then(function (instance) {
 			marketplaceInstance = instance;
 			return marketplaceInstance.getListingAtIndex.call(parseInt(listingIndex))
-		}).then(function (listingHash) {
+		}).then(function (returnedListingHash) {
+			listingHash = returnedListingHash
 			return marketplaceInstance.getListing.call(listingHash)
 		}).then(function (listing) {
 			console.log(listing)
@@ -162,8 +165,82 @@ App = {
 
 			console.log("Refreshing listing");
 			listingDetails.innerHTML = res;
+
+			if (listing[0] == false) {
+				$("#purchaseListing").hide()
+			}
+			console.log(listing[5])
+
+			if (listing[5] != 0x0000000000000000000000000000000000000000000000000000000000000000) {
+				console.log("hello")
+				marketplaceInstance.getListingEscrow.call(listingHash).then(function (escrow) {
+					console.log(escrow)
+
+					$("#escrowTable").show()
+					let escrowDetails = document.getElementById("escrowDetails")
+					let res = "";
+					res = res + "<tr>";
+					res = res + "<td>" + listing[5] + "</a></td>"
+					res = res + "<td>" + escrow[0] + "</a></td>"
+					res = res + "<td>" + escrow[1] + "</a></td>"
+					res = res + "<td>" + escrow[2] + "</a></td>"
+					res = res + "<td>" + web3.fromWei(escrow[3], "ether") + " ETH" + "</a></td>"
+					res = res + "<td>" + escrow[4] + "</a></td>"
+					res = res + "<td>" + escrow[5] + "</a></td>"
+					res = res + "<td>" + escrow[6] + "</a></td>"
+					res = res + "</tr>";
+
+					escrowDetails.innerHTML = res;
+				})
+			}
 		})
+	},
+
+	purchaseListing: function () {
+		let marketplaceInstance
+		let listingIndex = getParameterByName("listingIndex")
+		let listingHash
+		App.contracts.Marketplace.deployed().then(function (instance) {
+			marketplaceInstance = instance;
+			return marketplaceInstance.getListingAtIndex.call(parseInt(listingIndex))
+		}).then(function (returnedListingHash) {
+			listingHash = returnedListingHash
+			return marketplaceInstance.getListing.call(listingHash)
+		}).then(function (listing) {
+			return marketplaceInstance.purchaseListing(listingHash, {from: App.account, value: listing[3]})
+		}).then(function (transactionHash) {
+			console.log(transactionHash)
+		})
+	},
+
+
+	setStatus: function (message, category) {
+		var status = document.getElementById("statusMessage");
+		status.innerHTML = message;
+
+		var panel = $("#statusPanel");
+		panel.removeClass("panel-warning");
+		panel.removeClass("panel-danger");
+		panel.removeClass("panel-success");
+
+		if (category === "warning") {
+			panel.addClass("panel-warning");
+		} else if (category === "error") {
+			panel.addClass("panel-danger");
+		} else {
+			panel.addClass("panel-success");
+		}
+	},
+
+	hideSpinner: function () {
+		$("#spinner").hide();
+	},
+
+	showSpinner: function () {
+		$("#spinner").show();
 	}
+
+
 }
 
 $(function () {

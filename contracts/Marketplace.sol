@@ -7,7 +7,7 @@ contract Marketplace {
     address owner;
     address escrowAgentAddress;
 
-    event Created(bytes32 listingHash);
+    event CreatedListing(bytes32 listingHash);
     event ListingPurchased(bytes32 listingHash);
 
     struct Listing {
@@ -16,6 +16,7 @@ contract Marketplace {
         string name;
         uint price;
         uint index;
+        bytes32 escrowHash;
     }
 
     mapping (bytes32 => Listing) private listings;
@@ -46,7 +47,7 @@ contract Marketplace {
         listings[listingHash].name = name;
         listings[listingHash].price = price;
         listings[listingHash].index = listingIndex.push(listingHash) - 1;
-        Created(listingHash);
+        CreatedListing(listingHash);
         return listingIndex.length - 1;
     }
 
@@ -54,9 +55,17 @@ contract Marketplace {
         return listingIndex[index];
     }
 
-    function getListing(bytes32 listingHash) public view returns (bool available, address seller, string name, uint price, uint index) {
+    function getListing(bytes32 listingHash) public view returns (bool available, address seller, string name, uint price, uint index, bytes32 escrowHash) {
         require(isListing(listingHash));
-        return(listings[listingHash].available, listings[listingHash].seller, listings[listingHash].name, listings[listingHash].price, listings[listingHash].index);
+        Listing storage listing = listings[listingHash];
+        return(listing.available, listing.seller, listing.name, listing.price, listing.index, listing.escrowHash);
+    }
+
+    function getListingEscrow(bytes32 listingHash) public view returns(bool active, address seller, address buyer, uint balance, bool isBuyerApproved, bool isSellerApproved, bool isDisputed) {
+        require(isListing(listingHash));
+        require(listings[listingHash].escrowHash != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        EscrowAgent escrowAgent = EscrowAgent(escrowAgentAddress);
+        return escrowAgent.escrows(listings[listingHash].escrowHash);
     }
 
     function getListingCount() public view returns (uint count) {
@@ -75,6 +84,7 @@ contract Marketplace {
         require(msg.value == listing.price);
         EscrowAgent escrowAgent = EscrowAgent(escrowAgentAddress);
         escrowHash = escrowAgent.createEscrow.value(msg.value)(listing.seller, msg.sender);
+        listing.escrowHash = escrowHash;
         listing.available = false;
         ListingPurchased(listingHash);
         return escrowHash;

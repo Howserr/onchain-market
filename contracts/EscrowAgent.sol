@@ -5,7 +5,7 @@ contract EscrowAgent {
     address owner;
     address arbitrator;
 
-    event Created(bytes32 escrowHash);
+    event CreatedEscrow(bytes32 escrowHash);
     event BuyerApproved(bytes32 escrowHash, address approvedFrom);
     event SellerApproved(bytes32 escrowHash, address approvedFrom);
     event PaidOut(bytes32 escrowHash, address tranferedTo, uint value);
@@ -38,7 +38,7 @@ contract EscrowAgent {
         escrowHash = keccak256(seller, buyer, msg.value, now);
         require(!escrows[escrowHash].active);
         escrows[escrowHash] = Escrow(true, seller, buyer, msg.value, false, false, false);
-        Created(escrowHash);
+        CreatedEscrow(escrowHash);
         return escrowHash;
     }
 

@@ -45,6 +45,22 @@
                     </thead>
                     <tbody id="listingDetails"></tbody>
                 </table>
+                <button id="purchaseListing" onclick="App.purchaseListing()">Purchase Listing</button>
+                <table id="escrowTable" class="table table-striped" style="display:none">
+                    <thead>
+                    <tr>
+                        <th>Escrow Hash</th>
+                        <th>Active</th>
+                        <th>Seller</th>
+                        <th>Buyer</th>
+                        <th>balance</th>
+                        <th>isBuyerApproved</th>
+                        <th>isSellerApproved</th>
+                        <th>isDisputed</th>
+                    </tr>
+                    </thead>
+                    <tbody id="escrowDetails"></tbody>
+                </table>
             </div>
             <div class="col-md-4">
                 <div id="right-column"></div>
