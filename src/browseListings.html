@@ -18,56 +18,38 @@
 
 <body class="text-center">
 
-<div class="cover-container container-fluid d-flex p-3 flex-column">
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
     <header class="masthead mb-auto">
         <div class="inner">
             <h3 class="masthead-brand">On-Chain Market</h3>
             <nav class="nav nav-masthead justify-content-center">
                 <a class="nav-link" href="index.html">Home</a>
-                <a class="nav-link" href="browseListings.html">Browse Listings</a>
+                <a class="nav-link active" href="browseListings.html">Browse Listings</a>
                 <a class="nav-link" href="userListings.html">My Listings</a>
             </nav>
         </div>
     </header>
 
     <main role="main" class="inner cover">
-        <h1>Listing Details</h1>
-        <div class="row">
+        <div class="row" id="listingRow">
+            <div class="col-md-1"></div>
             <div class="col-md-12">
-                <h2><span id="listingTitle"></span></h2>
+                <div id="listingSection">
+                    <h1>Currently Listed</h1>
+                </div>
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        <th>Available</th>
-                        <th>Seller</th>
                         <th>Name</th>
                         <th>Price</th>
                     </tr>
                     </thead>
-                    <tbody id="listingDetails"></tbody>
+                    <tbody id="marketListings"></tbody>
                 </table>
-                <button id="purchaseListing" onclick="App.purchaseListing()">Purchase Listing</button>
-                <table id="escrowTable" class="table table-striped" style="display:none">
-                    <thead>
-                    <tr>
-                        <th>Escrow Hash</th>
-                        <th>Active</th>
-                        <th>Seller</th>
-                        <th>Buyer</th>
-                        <th>balance</th>
-                        <th>isBuyerApproved</th>
-                        <th>isSellerApproved</th>
-                        <th>isDisputed</th>
-                    </tr>
-                    </thead>
-                    <tbody id="escrowDetails"></tbody>
-                </table>
-                <button id="approveEscrow" onclick="App.approveEscrow()" style="display:none">Approve Escrow</button>
-                <button id="disputeEscrow" onclick="App.disputeEscrow()" style="display:none">Dispute Escrow</button>
             </div>
-            <div class="col-md-4">
-                <div id="right-column"></div>
-            </div>
+        </div>
+        <div class="col-md-4">
+            <div id="right-column"></div>
         </div>
     </main>
 
@@ -87,6 +69,6 @@
 <script src="js/truffle-contract.js"></script>
 <script src="js/app.js"></script>
 <script src="js/marketplace.js"></script>
-<script src="js/listing.js"></script>
+<script src="js/browseListings.js"></script>
 </body>
 </html>
