@@ -9,7 +9,6 @@ App = {
 		return $.getJSON('Marketplace.json').then(function (data) {
 			App.contracts.Marketplace = TruffleContract(data);
 			App.contracts.Marketplace.setProvider(App.web3Provider);
-
 			return $.getJSON('EscrowAgent.json')
 		}).then(function (data) {
 			App.contracts.EscrowAgent = TruffleContract(data);
@@ -89,15 +88,7 @@ App = {
 		} else {
 			panel.addClass("panel-success");
 		}
-	},
-
-	hideSpinner: function () {
-		$("#spinner").hide();
-	},
-
-	showSpinner: function () {
-		$("#spinner").show();
-	},
+	}
 };
 
 function getParameterByName(name, url) {

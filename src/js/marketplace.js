@@ -12,6 +12,7 @@ App.purchaseListing = function () {
 	let marketplaceInstance;
 	let listingIndex = getParameterByName("listingIndex");
 	let listingHash;
+	App.setStatus("Purchasing listing, please wait.", "warning");
 	App.contracts.Marketplace.deployed().then(function (instance) {
 		marketplaceInstance = instance;
 		return marketplaceInstance.getListingAtIndex.call(parseInt(listingIndex));
@@ -20,8 +21,9 @@ App.purchaseListing = function () {
 		return marketplaceInstance.getListing.call(listingHash);
 	}).then(function (listing) {
 		return marketplaceInstance.purchaseListing(listingHash, {value: listing[3]});
-	}).then(function (transactionHash) {
-		console.log(transactionHash);
+	}).then(function (result) {
+		console.log(result);
+		App.setStatus("Listing purchased in transaction: " + result.tx);
 	})
 };
 
@@ -30,10 +32,13 @@ App.createListing = function () {
 	let listingPrice = web3.toWei(parseFloat(document.getElementById("listingPrice").value), "ether");
 	console.log("Setting name to: " + listingName);
 	console.log("Setting price to: " + listingPrice);
-
+	App.setStatus("Creating listing, please wait.", "warning");
+	App.showSpinner();
 	App.contracts.Marketplace.deployed().then(function (instance) {
 		return instance.addListing(listingName, listingPrice, {from: App.account});
 	}).then(function (result) {
 		console.log(result);
+		App.setStatus("Listing created in transaction: " + result.tx);
+		App.hideSpinner();
 	})
 };
