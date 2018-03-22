@@ -12,7 +12,7 @@ App.approveEscrow = function () {
 		escrowHash = listing[5];
 		return App.contracts.EscrowAgent.deployed()
 	}).then(function (instance) {
-		instance.approve(escrowHash)
+		instance.approve(escrowHash, {from: App.account})
 	}).then(function (result) {
 		console.log(result)
 		App.setStatus("Escrow approved in transaction: " + result.tx);

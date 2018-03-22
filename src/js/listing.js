@@ -20,7 +20,7 @@ App.refreshListing = function () {
 		listingDetails.innerHTML = res;
 
 		if (!listing[0] || App.account == listing[1]) {
-			$("#purchaseListing").hide()
+			$("#beginPurchase").hide()
 		}
 
 		if (listing[5] != 0x0000000000000000000000000000000000000000000000000000000000000000) {
@@ -61,6 +61,10 @@ App.refreshListing = function () {
 			})
 		}
 	})
+};
+
+App.beginPurchase = function () {
+	$("#deliveryInfo").show();
 };
 
 $(function () {

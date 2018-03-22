@@ -8,7 +8,7 @@ contract Marketplace {
     address escrowAgentAddress;
 
     event CreatedListing(bytes32 listingHash);
-    event ListingPurchased(bytes32 listingHash);
+    event ListingPurchased(bytes32 listingHash, string addressInformation);
 
     struct Listing {
         bool available;
@@ -86,7 +86,7 @@ contract Marketplace {
         return listingHash;
     }
 
-    function purchaseListing(bytes32 listingHash) payable public returns (bytes32 escrowHash) {
+    function purchaseListing(bytes32 listingHash, string addressInformation) payable public returns (bytes32 escrowHash) {
         require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
         require(msg.value == listing.price);
@@ -94,7 +94,7 @@ contract Marketplace {
         escrowHash = escrowAgent.createEscrow.value(msg.value)(listing.seller, msg.sender);
         listing.escrowHash = escrowHash;
         listing.available = false;
-        ListingPurchased(listingHash);
+        ListingPurchased(listingHash, addressInformation);
         return escrowHash;
     }
 }
