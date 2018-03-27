@@ -8,7 +8,7 @@ contract Marketplace {
     address escrowAgentAddress;
 
     event CreatedListing(bytes32 listingHash);
-    event ListingPurchased(bytes32 listingHash, string addressInformation);
+    event ListingPurchased(bytes32 listingHash, string deliveryInformation);
 
     struct Listing {
         bool available;
@@ -17,6 +17,7 @@ contract Marketplace {
         uint price;
         uint index;
         bytes32 escrowHash;
+        string deliveryInformation;
     }
 
     mapping (bytes32 => Listing) private listings;
@@ -62,10 +63,10 @@ contract Marketplace {
         return listingIndex[index];
     }
 
-    function getListing(bytes32 listingHash) public view returns (bool available, address seller, string name, uint price, uint index, bytes32 escrowHash) {
+    function getListing(bytes32 listingHash) public view returns (bool available, address seller, string name, uint price, uint index, bytes32 escrowHash, string deliveryInformation) {
         require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
-        return(listing.available, listing.seller, listing.name, listing.price, listing.index, listing.escrowHash);
+        return(listing.available, listing.seller, listing.name, listing.price, listing.index, listing.escrowHash, listing.deliveryInformation);
     }
 
     function getListingCount() public view returns (uint count) {
@@ -86,15 +87,16 @@ contract Marketplace {
         return listingHash;
     }
 
-    function purchaseListing(bytes32 listingHash, string addressInformation) payable public returns (bytes32 escrowHash) {
+    function purchaseListing(bytes32 listingHash, string deliveryInformation) payable public returns (bytes32 escrowHash) {
         require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
         require(msg.value == listing.price);
         EscrowAgent escrowAgent = EscrowAgent(escrowAgentAddress);
         escrowHash = escrowAgent.createEscrow.value(msg.value)(listing.seller, msg.sender);
         listing.escrowHash = escrowHash;
+        listing.deliveryInformation = deliveryInformation;
         listing.available = false;
-        ListingPurchased(listingHash, addressInformation);
+        ListingPurchased(listingHash, deliveryInformation);
         return escrowHash;
     }
 }

@@ -27,22 +27,24 @@ App.refreshListing = function () {
 			App.contracts.EscrowAgent.deployed().then(function (instance) {
 				return instance.getEscrow.call(listing[5])
 			}).then(function (escrow) {
-				console.log(escrow)
+				console.log(escrow);
 
-				$("#escrowTable").show();
-				let escrowDetails = document.getElementById("escrowDetails");
-				let res = "";
-				res = res + "<tr>";
-				res = res + "<td>" + listing[5] + "</a></td>";
-				res = res + "<td>" + escrow[0] + "</a></td>";
-				res = res + "<td>" + escrow[1] + "</a></td>";
-				res = res + "<td>" + escrow[2] + "</a></td>";
-				res = res + "<td>" + web3.fromWei(escrow[3], "ether") + " ETH" + "</a></td>";
-				res = res + "<td>" + escrow[4] + "</a></td>";
-				res = res + "<td>" + escrow[5] + "</a></td>";
-				res = res + "<td>" + escrow[6] + "</a></td>";
-				res = res + "</tr>";
-				escrowDetails.innerHTML = res;
+				if (App.account == listing[1]) {
+					$("#purchaseListing").hide();
+					$("#deliveryInfo").show();
+					document.getElementById("deliveryInfoText").value = listing[6];
+					document.getElementById("deliveryInfoText").readonly = true;
+				}
+
+				$("#escrowForm").show();
+				document.getElementById("escrowHash").value = listing[5];
+				document.getElementById("escrowActive").value = escrow[0];
+				document.getElementById("listingSeller").value = escrow[1];
+				document.getElementById("listingBuyer").value = escrow[2];
+				document.getElementById("escrowBalance").value = web3.fromWei(escrow[3], "ether") + " ETH";
+				document.getElementById("buyerApproved").value = escrow[4];
+				document.getElementById("sellerApproved").value = escrow[5];
+				document.getElementById("escrowDisputed").value = escrow[6];
 
 				// if escrow is active
 				if (escrow[0]) {
@@ -65,6 +67,7 @@ App.refreshListing = function () {
 
 App.beginPurchase = function () {
 	$("#deliveryInfo").show();
+	$("#beginPurchase").hide();
 };
 
 $(function () {

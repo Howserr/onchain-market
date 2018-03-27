@@ -14,7 +14,7 @@ App.approveEscrow = function () {
 	}).then(function (instance) {
 		instance.approve(escrowHash, {from: App.account})
 	}).then(function (result) {
-		console.log(result)
+		console.log(result);
 		App.setStatus("Escrow approved in transaction: " + result.tx);
 	})
 };
@@ -29,7 +29,7 @@ App.disputeEscrow = function () {
 	}).then(function (instance) {
 		instance.dispute(escrowHash, {from: App.account})
 	}).then(function (result) {
-		console.log(result)
+		console.log(result);
 		App.setStatus("Escrow disputed in transaction: " + result.tx);
 	})
 };

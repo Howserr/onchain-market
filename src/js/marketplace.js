@@ -12,7 +12,7 @@ App.purchaseListing = function () {
 	let marketplaceInstance;
 	let listingIndex = getParameterByName("listingIndex");
 	let listingHash;
-	let addressInfo = document.getElementById("deliveryInfoText").value
+	let addressInfo = document.getElementById("deliveryInfoText").value;
 	console.log(addressInfo);
 	App.setStatus("Purchasing listing, please wait.", "warning");
 	App.contracts.Marketplace.deployed().then(function (instance) {

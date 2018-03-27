@@ -12,14 +12,6 @@ contract('given a marketplace contract', function(accounts) {
         marketplace = await Marketplace.new(escrowAgentMock.address)
     })
 
-    describe('whdqwh', function() {
-        it('gasd', async function() {
-            const result = await marketplace.getListingCount.call()
-
-            assert.equal(result, 100)
-        })
-    })
-
     // describe('when a listing is created', async function() {
     //     let listingHash
     //

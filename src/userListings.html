@@ -9,9 +9,6 @@
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="css/cover.css" rel="stylesheet">
-
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 </head>
@@ -31,33 +28,31 @@
     </header>
 
     <main role="main" class="inner cover">
-        <h1>My Listings</h1>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Available</th>
-                <th>Name</th>
-                <th>Price</th>
-            </tr>
-            </thead>
-            <tbody id="userListings"></tbody>
-        </table>
-        <h1>Create Listing</h1>
-        <table class="listingDetails">
-            <tr><td class="listingLabel"><label for="listingName">Listing Name:</label></td><td><input type="text" id="listingName" placeholder="eg Shoes"></input></td></tr>
-            <tr><td class="listingLabel"><label for="listingPrice">Price in Ether:</label></td><td><input type="text" id="listingPrice" placeholder="eg 3.0"></input></td></tr>
-            <tr><td class="listingLabel">&nbsp;</td><td><button id="createListing" onclick="App.createListing()">Create Listing</button></td></tr>
-        </table>
-        <div class="col-md-4">
-            <div id="right-column"></div>
+        <div class="row">
+            <div class="col-md-8">
+                <h1>My Listings</h1>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Available</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                    </thead>
+                    <tbody id="userListings"></tbody>
+                </table>
+                <h1>Create Listing</h1>
+                <table class="listingDetails">
+                    <tr><td class="listingLabel"><label for="listingName">Listing Name:</label></td><td><input type="text" id="listingName" placeholder="eg Shoes"></input></td></tr>
+                    <tr><td class="listingLabel"><label for="listingPrice">Price in Ether:</label></td><td><input type="text" id="listingPrice" placeholder="eg 3.0"></input></td></tr>
+                    <tr><td class="listingLabel">&nbsp;</td><td><button id="createListing" onclick="App.createListing()">Create Listing</button></td></tr>
+                </table>
+            </div>
+            <div class="col-md-4">
+                <div id="right-column"></div>
+            </div>
         </div>
     </main>
-
-    <footer class="mastfoot mt-auto">
-        <div class="inner">
-            <p>Cover template for <a href="https://getbootstrap.com/">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
-        </div>
-    </footer>
 </div>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

@@ -40,6 +40,10 @@ contract EscrowAgent {
         if (escrowIndex.length == 0) {
             return false;
         }
+        if (escrows[escrowHash].buyer == address(0)) {
+            return false;
+        }
+
         return (escrowIndex[escrows[escrowHash].index] == escrowHash);
     }
 
@@ -107,6 +111,7 @@ contract EscrowAgent {
         Escrow storage escrow = escrows[escrowHash];
         require(escrow.active);
         require(msg.sender == escrow.buyer || msg.sender == escrow.seller);
+
         escrow.isDisputed = true;
         Disputed(escrowHash, msg.sender);
     }
@@ -120,6 +125,4 @@ contract EscrowAgent {
         PaidOut(escrowHash, awardedTo, escrow.balance);
         DisputeResolved(escrowHash, msg.sender, awardedTo);
     }
-
-    // TODO: Look at modifer methods to replace the regular require checks
 }
