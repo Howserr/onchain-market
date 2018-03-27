@@ -26,6 +26,11 @@ contract EscrowAgent {
     mapping (bytes32 => Escrow) public escrows;
     bytes32[] private escrowIndex;
 
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
     modifier onlyArbitrator() {
         require(msg.sender == arbitrator);
         _;
@@ -34,6 +39,10 @@ contract EscrowAgent {
     function EscrowAgent() public {
         owner = msg.sender;
         arbitrator = msg.sender;
+    }
+
+    function getBalance() public view onlyOwner returns (uint balance) {
+        return this.balance;
     }
 
     function isEscrow(bytes32 escrowHash) public view returns (bool isIndeed) {
@@ -124,5 +133,6 @@ contract EscrowAgent {
         awardedTo.transfer(escrow.balance);
         PaidOut(escrowHash, awardedTo, escrow.balance);
         DisputeResolved(escrowHash, msg.sender, awardedTo);
+        escrow.active = false;
     }
 }
