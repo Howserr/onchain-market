@@ -278,5 +278,106 @@ contract('given an escrow agent contract', function (accounts) {
 		})
 	});
 
+	describe('when getEscrowAtIndex is called', async function () {
 
+		it('then it throws if the index is higher than the length of the index', async function () {
+			try {
+				await escrowAgent.getEscrowAtIndex.call(0);
+			} catch (error) {
+				assert.equal(error.name, "Error")
+			}
+		})
+
+		it('then it returns the escrow hash for a valid index', async function () {
+			let escrowHash;
+
+			const transactionHash = await escrowAgent.createEscrow(seller, buyer, {
+				from: buyer,
+				value: web3.toWei(0.01, "ether")
+			})
+			escrowHash = transactionHash.logs[0].args.escrowHash
+
+			const result = await escrowAgent.getEscrowAtIndex.call(0);
+
+			assert.equal(result, escrowHash);
+		})
+	});
+
+	describe('when getEscrow is called', async function () {
+		describe('for an escrow that exists', async function () {
+			let escrowHash;
+
+			beforeEach('create an escrow', async function () {
+				const transactionHash = await escrowAgent.createEscrow(seller, buyer, {
+					from: buyer,
+					value: web3.toWei(0.01, "ether")
+				});
+				escrowHash = transactionHash.logs[0].args.escrowHash
+
+				const transactionHash2 = await escrowAgent.createEscrow(seller, buyer, {
+					from: buyer,
+					value: web3.toWei(0.02, "ether")
+				});
+				escrowHash = transactionHash.logs[0].args.escrowHash
+			});
+
+			it('returns the correct active status', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+
+				assert.isTrue(result[0])
+			});
+
+			it('returns the correct seller', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+
+				assert.equal(result[1], seller);
+			});
+
+			it('returns the correct buyer', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+
+				assert.equal(result[2], buyer);
+			});
+
+			it('returns the correct balance', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+
+				assert.equal(result[3], web3.toWei(0.01, "ether"));
+			});
+
+			it('returns the correct buyer approved status', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+
+				assert.isFalse(result[4]);
+			})
+
+			it('returns the correct seller approved status', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+
+				assert.isFalse(result[5]);
+			})
+
+			it('returns the correct disputed status', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+
+				assert.isFalse(result[6]);
+			})
+
+			it('returns the correct index', async function () {
+				const result = await escrowAgent.getEscrow.call(escrowHash);
+				console.log(result);
+				assert.equal(result[7].s, 1);
+			})
+		})
+
+		describe('for an escrow hash that does not exist', async function () {
+			it('then it throws', async function () {
+				try {
+					await escrowAgent.getEscrow.call(0);
+				} catch (error) {
+					assert.equal(error.name, "Error")
+				}
+			})
+		})
+	})
 })
