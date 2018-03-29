@@ -23,7 +23,7 @@ contract EscrowAgent {
         uint index;
     }
 
-    mapping (bytes32 => Escrow) public escrows;
+    mapping (bytes32 => Escrow) private escrows;
     bytes32[] private escrowIndex;
 
     modifier onlyOwner() {

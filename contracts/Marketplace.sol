@@ -29,16 +29,21 @@ contract Marketplace {
         owner = msg.sender;
         escrowAgentAddress = escrowAddress;
 
-        insertListing(keccak256(msg.sender, "listing 1", 1, now), msg.sender, "listing 1", 1 ether);
-        insertListing(keccak256(msg.sender, "listing 2", 2, now), msg.sender, "listing 2", 2 ether);
-        insertListing(keccak256(msg.sender, "listing 3", 3, now), msg.sender, "listing 3", 3 ether);
-        listings[listingIndex[2]].available = false;
+//        insertListing(keccak256(msg.sender, "listing 1", 1, now), msg.sender, "listing 1", 1 ether);
+//        insertListing(keccak256(msg.sender, "listing 2", 2, now), msg.sender, "listing 2", 2 ether);
+//        insertListing(keccak256(msg.sender, "listing 3", 3, now), msg.sender, "listing 3", 3 ether);
+//        listings[listingIndex[2]].available = false;
     }
 
     function isListing(bytes32 listingHash) public view returns (bool isIndeed) {
         if (listingIndex.length == 0) {
             return false;
         }
+
+        if (listings[listingHash].seller == address(0)) {
+            return false;
+        }
+
         return (listingIndex[listings[listingHash].index] == listingHash);
     }
 
@@ -69,15 +74,15 @@ contract Marketplace {
         return(listing.available, listing.seller, listing.name, listing.price, listing.index, listing.escrowHash, listing.deliveryInformation);
     }
 
-    function getListingCount() public view returns (uint count) {
+    function getListingCount() public view returns (uint) {
         return listingIndex.length;
     }
 
-    function getUserListingCount(address user) public view returns (uint count) {
+    function getUserListingCount(address user) public view returns (uint) {
         return listingsByUser[user].length;
     }
 
-    function getListingIndexForUserByIndex(address user, uint index) returns (uint listingIndex) {
+    function getListingIndexForUserByIndex(address user, uint index) public view returns (uint) {
         return listingsByUser[user][index];
     }
 

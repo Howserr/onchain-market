@@ -33,44 +33,44 @@ contract('given an escrow agent contract', function (accounts) {
 			})
 
 			it('then set the escrow mapped to the escrow hash to exist', async function () {
-				const result = await escrowAgent.escrows.call(escrowHash);
+				const result = await escrowAgent.getEscrow.call(escrowHash);
 
 				assert.isTrue(result[0]);
 			})
 
 			it('then set the mapped escrow balance to the value sent', async function () {
-				const result = await escrowAgent.escrows.call(escrowHash);
+				const result = await escrowAgent.getEscrow.call(escrowHash);
 
 				assert.equal(result[3], web3.toWei(0.01, "ether"));
 			})
 
 			it('then set the mapped escrow seller to the seller specified', async function () {
-				const result = await escrowAgent.escrows.call(escrowHash);
+				const result = await escrowAgent.getEscrow.call(escrowHash);
 
 				assert.equal(result[1], seller);
 			})
 
 			it('then set the mapped escrow buyer to the buyer specified', async function () {
-				const result = await escrowAgent.escrows.call(escrowHash);
+				const result = await escrowAgent.getEscrow.call(escrowHash);
 
 				assert.equal(result[2], buyer);
 			})
 
 			it('then set the mapped escrow buyerApproved and sellerApproved to false', async function () {
-				const result = await escrowAgent.escrows.call(escrowHash);
+				const result = await escrowAgent.getEscrow.call(escrowHash);
 
 				assert.isFalse(result[4]);
 				assert.isFalse(result[5]);
 			})
 
 			it('then set the mapped escrow isDisputed to false', async function () {
-				const result = await escrowAgent.escrows.call(escrowHash);
+				const result = await escrowAgent.getEscrow.call(escrowHash);
 
 				assert.isFalse(result[6]);
 			})
 
 			it('then set the mapped escrow index correctly', async function () {
-				const result = await escrowAgent.escrows.call(escrowHash);
+				const result = await escrowAgent.getEscrow.call(escrowHash);
 
 				assert.equal(result[7].toNumber(), 1);
 			})
@@ -128,7 +128,7 @@ contract('given an escrow agent contract', function (accounts) {
 			describe('by the buyer', function () {
 				it('then set buyerApproved to true', async function () {
 					escrowAgent.approve(escrowHash, {from: buyer})
-					const result = await escrowAgent.escrows.call(escrowHash)
+					const result = await escrowAgent.getEscrow.call(escrowHash)
 
 					assert.isTrue(result[4])
 				})
@@ -149,7 +149,7 @@ contract('given an escrow agent contract', function (accounts) {
 					let transactionHash = await escrowAgent.approve(escrowHash, {from: buyer})
 					let approvalAddress = transactionHash.logs[0].args.approvedFrom
 
-					const escrow = await escrowAgent.escrows.call(escrowHash)
+					const escrow = await escrowAgent.getEscrow.call(escrowHash)
 					assert.equal(approvalAddress, escrow[2])
 				})
 			})
@@ -157,7 +157,7 @@ contract('given an escrow agent contract', function (accounts) {
 			describe('by the seller', function () {
 				it('then set sellerApproved to true', async function () {
 					escrowAgent.approve(escrowHash, {from: seller})
-					const result = await escrowAgent.escrows.call(escrowHash)
+					const result = await escrowAgent.getEscrow.call(escrowHash)
 
 					assert.isTrue(result[5])
 				})
@@ -178,7 +178,7 @@ contract('given an escrow agent contract', function (accounts) {
 					let transactionHash = await escrowAgent.approve(escrowHash, {from: seller})
 					let approvalAddress = transactionHash.logs[0].args.approvedFrom
 
-					const escrow = await escrowAgent.escrows.call(escrowHash)
+					const escrow = await escrowAgent.getEscrow.call(escrowHash)
 					assert.equal(approvalAddress, escrow[1])
 				})
 			})
@@ -193,13 +193,13 @@ contract('given an escrow agent contract', function (accounts) {
 				})
 
 				it('then approval states should be unchanged', async function () {
-					const escrow = await escrowAgent.escrows.call(escrowHash)
+					const escrow = await escrowAgent.getEscrow.call(escrowHash)
 					try {
 						await escrowAgent.approve(escrowHash, {from: accounts[3]})
 					} catch (error) {
 					}
 
-					const result = await escrowAgent.escrows.call(escrowHash)
+					const result = await escrowAgent.getEscrow.call(escrowHash)
 					assert.equal(result[4], escrow[4])
 					assert.equal(result[5], escrow[5])
 				})
@@ -269,7 +269,7 @@ contract('given an escrow agent contract', function (accounts) {
 				it('then set isDisputed to true', async function () {
 					await escrowAgent.dispute(escrowHash, {from: buyer})
 
-					const escrow = await escrowAgent.escrows.call(escrowHash)
+					const escrow = await escrowAgent.getEscrow.call(escrowHash)
 					assert.isTrue(escrow[6])
 				})
 			})
@@ -289,7 +289,7 @@ contract('given an escrow agent contract', function (accounts) {
 					} catch (error) {
 					}
 
-					const escrow = await escrowAgent.escrows.call(escrowHash)
+					const escrow = await escrowAgent.getEscrow.call(escrowHash)
 					assert.isFalse(escrow[6])
 				})
 			})
