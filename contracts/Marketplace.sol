@@ -68,7 +68,7 @@ contract Marketplace {
         return listingIndex[index];
     }
 
-    function getListing(bytes32 listingHash) public view returns (bool available, address seller, string name, uint price, uint index, bytes32 escrowHash, string deliveryInformation) {
+    function getListing(bytes32 listingHash) public view returns (bool, address, string, uint, uint, bytes32, string) {
         require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
         return(listing.available, listing.seller, listing.name, listing.price, listing.index, listing.escrowHash, listing.deliveryInformation);
@@ -83,6 +83,7 @@ contract Marketplace {
     }
 
     function getListingIndexForUserByIndex(address user, uint index) public view returns (uint) {
+        require(index < listingsByUser[user].length);
         return listingsByUser[user][index];
     }
 

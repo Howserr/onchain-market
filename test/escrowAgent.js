@@ -232,7 +232,7 @@ contract('given an escrow agent contract', function (accounts) {
 		describe('that does not exist', function () {
 			it('then it should error', async function () {
 				try {
-					await escrowAgent.approve(0, {from: accounts[5]})
+					await escrowAgent.approve(0x0000000000000000000000000000000000000000000000000000000000000000, {from: accounts[5]})
 				} catch (error) {
 					assert.equal(error.name, "StatusError")
 				}
@@ -390,7 +390,7 @@ contract('given an escrow agent contract', function (accounts) {
 		describe('for an escrow hash that does not exist', async function () {
 			it('then it throws', async function () {
 				try {
-					await escrowAgent.getEscrow.call(0);
+					await escrowAgent.getEscrow.call(0x0000000000000000000000000000000000000000000000000000000000000000);
 				} catch (error) {
 					assert.equal(error.name, "Error")
 				}
@@ -434,8 +434,6 @@ contract('given an escrow agent contract', function (accounts) {
 						const result = await escrowAgent.getEscrow.call(escrowHash);
 
 						let finalBalance = await escrowAgent.getBalance.call({from: accounts[0]});
-						console.log(initialBalance);
-						console.log(finalBalance);
 
 						assert.equal(finalBalance.toNumber(), initialBalance.toNumber() - web3.toWei(0.01, "ether"));
 					});
@@ -468,7 +466,7 @@ contract('given an escrow agent contract', function (accounts) {
 		describe('for an escrow hash that does not exist', async function () {
 			it('then it throws', async function () {
 				try {
-					await escrowAgent.arbitrate(0, seller, {from: accounts[0]});
+					await escrowAgent.arbitrate(0x0000000000000000000000000000000000000000000000000000000000000000, seller, {from: accounts[0]});
 				} catch (error) {
 					assert.equal(error.name, "StatusError")
 				}
