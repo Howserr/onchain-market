@@ -29,11 +29,6 @@ contract Marketplace {
     function Marketplace(address escrowAddress) public {
         owner = msg.sender;
         escrowAgentAddress = escrowAddress;
-
-//        insertListing(keccak256(msg.sender, "listing 1", 1, now), msg.sender, "listing 1", 1 ether);
-//        insertListing(keccak256(msg.sender, "listing 2", 2, now), msg.sender, "listing 2", 2 ether);
-//        insertListing(keccak256(msg.sender, "listing 3", 3, now), msg.sender, "listing 3", 3 ether);
-//        listings[listingIndex[2]].available = false;
     }
 
     function isListing(bytes32 listingHash) public view returns (bool isIndeed) {
