@@ -217,7 +217,7 @@ contract('given a marketplace contract', function(accounts) {
 		});
 	});
 
-	describe('when getListingIndexForUserByIndex', function () {
+	describe('when getListingIndexForUserByIndex is called', function () {
 		let listingHash;
 
 		beforeEach('create a couple of listings', async function() {
@@ -237,6 +237,54 @@ contract('given a marketplace contract', function(accounts) {
 
 		it('with a valid index the specified user then it returns the correct listing index', async function () {
 			let result = await marketplace.getListingIndexForUserByIndex.call(seller, 1);
+
+			assert.equal(result, 1);
+		})
+	});
+
+	describe('when getUserOrderCount is called', function () {
+		let listingHash;
+
+		beforeEach('create a couple of listings', async function() {
+			await marketplace.addListing("item1", web3.toWei(0.01, "ether"), {from: seller});
+
+			const transactionHash = await marketplace.addListing("item2", web3.toWei(0.02, "ether"), {from: seller});
+			listingHash = transactionHash.logs[0].args.listingHash;
+		});
+
+		it('then it returns the correct index length', async function () {
+			await marketplace.purchaseListing(listingHash, "", {from: buyer, value: web3.toWei(0.02, "ether")})
+
+
+			let result = await marketplace.getUserOrderCount.call(buyer);
+
+			assert.equal(result, 1);
+		})
+	});
+
+	describe('when getListingIndexForUserOrderByIndex is called', function () {
+		let listingHash;
+
+		beforeEach('create a couple of listings', async function() {
+			await marketplace.addListing("item1", web3.toWei(0.01, "ether"), {from: seller});
+
+			const transactionHash = await marketplace.addListing("item2", web3.toWei(0.02, "ether"), {from: seller});
+			listingHash = transactionHash.logs[0].args.listingHash;
+		});
+
+		it('with an invalid index for the specified user then it throws', async function () {
+			try {
+				await marketplace.getListingIndexForUserOrderByIndex.call(buyer, 0);
+			} catch (error) {
+				assert.equal(error.name, "Error");
+			}
+		});
+
+		it('then it returns the correct index length', async function () {
+			await marketplace.purchaseListing(listingHash, "", {from: buyer, value: web3.toWei(0.02, "ether")})
+
+
+			let result = await marketplace.getListingIndexForUserOrderByIndex.call(buyer, 0);
 
 			assert.equal(result, 1);
 		})
@@ -306,6 +354,14 @@ contract('given a marketplace contract', function(accounts) {
 
 				assert.equal(transactionHash.logs[0].event, "ListingPurchased");
 			});
+
+			it('then it adds the listing index to the appropriate user in the ordersByUser mapping', async function () {
+				await marketplace.purchaseListing(listingHash, "", {from: buyer, value: web3.toWei(0.02, "ether")})
+
+				const result = await marketplace.getListingIndexForUserOrderByIndex.call(buyer, 0);
+
+				assert.equal(result.toNumber(), 1);
+			})
 		});
 
 		describe('that does not exist', function () {

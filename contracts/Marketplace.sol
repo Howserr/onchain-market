@@ -24,6 +24,7 @@ contract Marketplace {
     bytes32[] private listingIndex;
 
     mapping(address => uint[]) private listingsByUser;
+    mapping(address => uint[]) private ordersByUser;
 
     function Marketplace(address escrowAddress) public {
         owner = msg.sender;
@@ -87,6 +88,15 @@ contract Marketplace {
         return listingsByUser[user][index];
     }
 
+    function getUserOrderCount(address user) public view returns (uint) {
+        return ordersByUser[user].length;
+    }
+
+    function getListingIndexForUserOrderByIndex(address user, uint index) public view returns (uint) {
+        require(index < ordersByUser[user].length);
+        return ordersByUser[user][index];
+    }
+
     function addListing(string name, uint price) public returns (bytes32 listingHash){
         listingHash = keccak256(msg.sender, name, price, now);
         insertListing(listingHash, msg.sender, name, price);
@@ -103,6 +113,7 @@ contract Marketplace {
         listing.deliveryInformation = deliveryInformation;
         listing.available = false;
         ListingPurchased(listingHash, deliveryInformation);
+        ordersByUser[msg.sender].push(listing.index);
         return escrowHash;
     }
 }

@@ -22,8 +22,8 @@
             <nav class="nav nav-masthead justify-content-center">
                 <a class="nav-link" href="index.html">Home</a>
                 <a class="nav-link" href="browseListings.html">Browse Listings</a>
-                <a class="nav-link active" href="userListings.html">My Listings</a>
-                <a class="nav-link" href="userOrders.html">My Orders</a>
+                <a class="nav-link" href="userListings.html">My Listings</a>
+                <a class="nav-link active" href="userOrders.html">My Orders</a>
             </nav>
         </div>
     </header>
@@ -31,22 +31,15 @@
     <main role="main" class="inner cover">
         <div class="row">
             <div class="col-md-8">
-                <h1>My Listings</h1>
+                <h1>My Orders</h1>
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        <th>Available</th>
                         <th>Name</th>
                         <th>Price</th>
                     </tr>
                     </thead>
-                    <tbody id="userListings"></tbody>
-                </table>
-                <h1>Create Listing</h1>
-                <table class="listingDetails">
-                    <tr><td class="listingLabel"><label for="listingName">Listing Name:</label></td><td><input type="text" id="listingName" placeholder="eg Shoes"></input></td></tr>
-                    <tr><td class="listingLabel"><label for="listingPrice">Price in Ether:</label></td><td><input type="text" id="listingPrice" placeholder="eg 3.0"></input></td></tr>
-                    <tr><td class="listingLabel">&nbsp;</td><td><button id="createListing" onclick="App.createListing()">Create Listing</button></td></tr>
+                    <tbody id="userOrders"></tbody>
                 </table>
             </div>
             <div class="col-md-4">
@@ -65,6 +58,6 @@
 <script src="js/truffle-contract.js"></script>
 <script src="js/app.js"></script>
 <script src="js/marketplace.js"></script>
-<script src="js/userListings.js"></script>
+<script src="js/userOrders.js"></script>
 </body>
 </html>

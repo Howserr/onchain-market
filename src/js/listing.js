@@ -29,7 +29,7 @@ App.refreshListing = function () {
 			}).then(function (escrow) {
 				console.log(escrow);
 
-				if (App.account == listing[1]) {
+				if (App.account == listing[1] || App.account == escrow[2]) {
 					$("#purchaseListing").hide();
 					$("#deliveryInfo").show();
 					document.getElementById("deliveryInfoText").value = listing[6];

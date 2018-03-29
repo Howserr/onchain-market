@@ -12,7 +12,7 @@ App.approveEscrow = function () {
 		escrowHash = listing[5];
 		return App.contracts.EscrowAgent.deployed()
 	}).then(function (instance) {
-		instance.approve(escrowHash, {from: App.account})
+		return instance.approve(escrowHash, {from: App.account})
 	}).then(function (result) {
 		console.log(result);
 		App.setStatus("Escrow approved in transaction: " + result.tx);
@@ -27,7 +27,7 @@ App.disputeEscrow = function () {
 		escrowHash = listing[5];
 		return App.contracts.EscrowAgent.deployed()
 	}).then(function (instance) {
-		instance.dispute(escrowHash, {from: App.account})
+		return instance.dispute(escrowHash, {from: App.account})
 	}).then(function (result) {
 		console.log(result);
 		App.setStatus("Escrow disputed in transaction: " + result.tx);
