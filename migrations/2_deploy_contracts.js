@@ -1,10 +1,10 @@
 var EscrowAgent = artifacts.require("./EscrowAgent.sol");
-var Marketplace = artifacts.require("./Marketplace.sol");
+var MarketplaceAgent = artifacts.require("./MarketplaceAgent.sol");
 
 module.exports = function (deployer) {
 	deployer.then(function () {
         return deployer.deploy(EscrowAgent);
 	}).then(function() {
-		return deployer.deploy(Marketplace, EscrowAgent.address)
+		return deployer.deploy(MarketplaceAgent, EscrowAgent.address)
 	});
 };

@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 import "./EscrowAgent.sol";
 
-contract Marketplace {
+contract MarketplaceAgent {
 
     address owner;
     address escrowAgentAddress;
@@ -26,12 +26,12 @@ contract Marketplace {
     mapping(address => uint[]) private listingsByUser;
     mapping(address => uint[]) private ordersByUser;
 
-    function Marketplace(address escrowAddress) public {
+    function MarketplaceAgent(address escrowAddress) public {
         owner = msg.sender;
         escrowAgentAddress = escrowAddress;
     }
 
-    function isListing(bytes32 listingHash) public view returns (bool isIndeed) {
+    function isListing(bytes32 listingHash) public view returns (bool) {
         if (listingIndex.length == 0) {
             return false;
         }

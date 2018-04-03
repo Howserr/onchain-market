@@ -6,7 +6,7 @@ App = {
 
 	init: async function () {
 		await App.initWeb3();
-		return $.getJSON('Marketplace.json').then(function (data) {
+		return $.getJSON('MarketplaceAgent.json').then(function (data) {
 			App.contracts.Marketplace = TruffleContract(data);
 			App.contracts.Marketplace.setProvider(App.web3Provider);
 			return $.getJSON('EscrowAgent.json')
