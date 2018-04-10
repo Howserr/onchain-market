@@ -1,7 +1,7 @@
 const MarketplaceAgent = artifacts.require('./MarketplaceAgent.sol');
 const EscrowAgent = artifacts.require('./EscrowAgent.sol');
 
-contract('given a marketplace contract', function(accounts) {
+contract('given a marketplace agent contract', function(accounts) {
     let marketplaceAgent;
 	let escrowAgent;
 
@@ -79,7 +79,7 @@ contract('given a marketplace contract', function(accounts) {
 				listingHash = transactionHash.logs[0].args.listingHash;
 			});
 
-			it('then return true', async function () {
+			it('then it returns true', async function () {
 				const result = await marketplaceAgent.isListing.call(listingHash, {from: buyer});
 
 				assert.isTrue(result);
@@ -87,7 +87,7 @@ contract('given a marketplace contract', function(accounts) {
 		});
 
 		describe('for a listing that does not exist', async function() {
-			it('then return false', async function () {
+			it('then it returns false', async function () {
 				const result = await marketplaceAgent.isListing.call(listingHash, {from: buyer});
 
 				assert.isFalse(result);
@@ -130,15 +130,17 @@ contract('given a marketplace contract', function(accounts) {
 			listingHash = transactionHash.logs[0].args.listingHash;
 		});
 
-		it('with a listing hash for an unused entry then it throws', async function () {
-			try {
-				await marketplaceAgent.getListing.call(0x0000000000000000000000000000000000000000000000000000000000000000);
-			} catch (error) {
-				assert.equal(error.name, "Error")
-			}
+		describe("for a listing that does not exist", function () {
+			it('then it throws', async function () {
+				try {
+					await marketplaceAgent.getListing.call(0x0000000000000000000000000000000000000000000000000000000000000000);
+				} catch (error) {
+					assert.equal(error.name, "Error")
+				}
+			});
 		});
 
-		describe("with a valid listing hash", function () {
+		describe("for a listing that exists", function () {
 			it('then it returns the correct listing seller', async function () {
 				let result = await marketplaceAgent.getListing.call(listingHash);
 
@@ -194,7 +196,7 @@ contract('given a marketplace contract', function(accounts) {
 		})
 	});
 
-	describe('when getListingCount is called', function () {
+	describe('when getUserListingCount is called', function () {
 		let listingHash;
 
 		beforeEach('create a couple of listings', async function() {
@@ -279,7 +281,7 @@ contract('given a marketplace contract', function(accounts) {
 			}
 		});
 
-		it('then it returns the correct index length', async function () {
+		it('then it returns the correct index', async function () {
 			await marketplaceAgent.purchaseListing(listingHash, "", {from: buyer, value: web3.toWei(0.02, "ether")})
 
 
@@ -299,8 +301,18 @@ contract('given a marketplace contract', function(accounts) {
 			listingHash = transactionHash.logs[0].args.listingHash;
 		});
 
+		describe('that does not exist', function () {
+			it('then it throws', async function () {
+				try {
+					await marketplaceAgent.purchaseListing(0x0000000000000000000000000000000000000000000000000000000000000000, "");
+				} catch (error) {
+					assert.equal(error.name, "StatusError");
+				}
+			});
+		});
+
 		describe('that exists', async function () {
-			it('but with not enough ether the it throws', async function (){
+			it('but with not enough ether then it throws', async function (){
 				try {
 					await marketplaceAgent.purchaseListing(listingHash, "", {from: buyer, value: web3.toWei(0.01, "ether")});
 				} catch (error) {
@@ -361,16 +373,6 @@ contract('given a marketplace contract', function(accounts) {
 
 				assert.equal(result.toNumber(), 1);
 			})
-		});
-
-		describe('that does not exist', function () {
-			it('then it throws', async function () {
-				try {
-					await marketplaceAgent.purchaseListing(0x0000000000000000000000000000000000000000000000000000000000000000, "");
-				} catch (error) {
-					assert.equal(error.name, "StatusError");
-				}
-			});
 		});
 	});
 });

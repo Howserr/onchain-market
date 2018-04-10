@@ -26,8 +26,17 @@ contract MarketplaceAgent {
     mapping(address => uint[]) private listingsByUser;
     mapping(address => uint[]) private ordersByUser;
 
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
     function MarketplaceAgent(address escrowAddress) public {
         owner = msg.sender;
+        escrowAgentAddress = escrowAddress;
+    }
+
+    function setEscrowAgentAddress(address escrowAddress) public onlyOwner {
         escrowAgentAddress = escrowAddress;
     }
 
