@@ -110,6 +110,7 @@ contract MarketplaceAgent {
     function purchaseListing(bytes32 listingHash, string deliveryInformation) payable public returns (bytes32 escrowHash) {
         require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
+        require(listing.available);
         require(msg.value == listing.price);
         EscrowAgent escrowAgent = EscrowAgent(escrowAgentAddress);
         escrowHash = escrowAgent.createEscrow.value(msg.value)(listing.seller, msg.sender);
