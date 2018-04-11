@@ -360,12 +360,6 @@ contract('given a marketplace agent contract', function(accounts) {
 				assert.isFalse(result[0]);
 			});
 
-			it('then it emits a ListingPurchased event', async function () {
-				let transactionHash = await marketplaceAgent.purchaseListing(listingHash, "", {from: buyer, value: web3.toWei(0.02, "ether")})
-
-				assert.equal(transactionHash.logs[0].event, "ListingPurchased");
-			});
-
 			it('then it adds the listing index to the appropriate user in the ordersByUser mapping', async function () {
 				await marketplaceAgent.purchaseListing(listingHash, "", {from: buyer, value: web3.toWei(0.02, "ether")})
 

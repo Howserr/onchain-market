@@ -6,11 +6,8 @@ contract EscrowAgent {
     address arbitrator;
 
     event CreatedEscrow(bytes32 escrowHash);
-    event BuyerApproved(bytes32 escrowHash, address approvedFrom);
-    event SellerApproved(bytes32 escrowHash, address approvedFrom);
     event PaidOut(bytes32 escrowHash, address tranferedTo, uint value);
     event Disputed(bytes32 escrowHash, address disputedBy);
-    event DisputeResolved(bytes32 escrowHash, address arbitratedBy, address awardedTo);
 
     struct Escrow {
         bool active;
@@ -41,7 +38,7 @@ contract EscrowAgent {
         arbitrator = msg.sender;
     }
 
-    function getBalance() public view onlyOwner returns (uint balance) {
+    function getBalance() external view onlyOwner returns (uint balance) {
         return this.balance;
     }
 
@@ -72,12 +69,12 @@ contract EscrowAgent {
         return escrowIndex.length - 1;
     }
 
-    function getEscrowAtIndex(uint index) public view returns (bytes32 escrowHash) {
+    function getEscrowAtIndex(uint index) external view returns (bytes32 escrowHash) {
         require(index < escrowIndex.length);
         return escrowIndex[index];
     }
 
-    function getEscrow(bytes32 escrowHash) public view returns (bool active, address seller, address buyer, uint balance, bool isBuyerApproved, bool isSellerApproved, bool isDisputed, uint index) {
+    function getEscrow(bytes32 escrowHash) external view returns (bool active, address seller, address buyer, uint balance, bool isBuyerApproved, bool isSellerApproved, bool isDisputed, uint index) {
         require(isEscrow(escrowHash));
         Escrow storage escrow = escrows[escrowHash];
         return(escrow.active, escrow.seller, escrow.buyer, escrow.balance, escrow.isBuyerApproved, escrow.isSellerApproved, escrow.isDisputed, escrow.index);
@@ -89,17 +86,15 @@ contract EscrowAgent {
         return escrowHash;
     }
 
-    function approve(bytes32 escrowHash) public {
+    function approve(bytes32 escrowHash) external {
         Escrow storage escrow = escrows[escrowHash];
         require(escrow.active);
         require(msg.sender == escrow.buyer || msg.sender == escrow.seller);
 
         if (msg.sender == escrow.buyer) {
             escrow.isBuyerApproved = true;
-            BuyerApproved(escrowHash, msg.sender);
         } else if (msg.sender == escrow.seller) {
             escrow.isSellerApproved = true;
-            SellerApproved(escrowHash, msg.sender);
         }
 
         if (escrow.isBuyerApproved && escrow.isSellerApproved) {
@@ -116,23 +111,21 @@ contract EscrowAgent {
         escrow.active = false;
     }
 
-    function dispute(bytes32 escrowHash) public {
+    function dispute(bytes32 escrowHash) external {
         Escrow storage escrow = escrows[escrowHash];
         require(escrow.active);
         require(msg.sender == escrow.buyer || msg.sender == escrow.seller);
-
         escrow.isDisputed = true;
         Disputed(escrowHash, msg.sender);
     }
 
-    function arbitrate(bytes32 escrowHash, address awardedTo) public onlyArbitrator {
+    function arbitrate(bytes32 escrowHash, address awardedTo) external onlyArbitrator {
         Escrow storage escrow = escrows[escrowHash];
         require(escrow.active);
         require(escrow.isDisputed);
         require(awardedTo == escrow.buyer || awardedTo == escrow.seller);
         awardedTo.transfer(escrow.balance);
         PaidOut(escrowHash, awardedTo, escrow.balance);
-        DisputeResolved(escrowHash, msg.sender, awardedTo);
         escrow.active = false;
     }
 }

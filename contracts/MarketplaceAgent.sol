@@ -8,7 +8,6 @@ contract MarketplaceAgent {
     address escrowAgentAddress;
 
     event CreatedListing(bytes32 listingHash);
-    event ListingPurchased(bytes32 listingHash, string deliveryInformation);
 
     struct Listing {
         bool available;
@@ -68,46 +67,46 @@ contract MarketplaceAgent {
         return listingIndex.length - 1;
     }
 
-    function getListingAtIndex(uint index) public view returns (bytes32 listingHash) {
+    function getListingAtIndex(uint index) external view returns (bytes32 listingHash) {
         require(index < listingIndex.length);
         return listingIndex[index];
     }
 
-    function getListing(bytes32 listingHash) public view returns (bool, address, string, uint, uint, bytes32, string) {
+    function getListing(bytes32 listingHash) external view returns (bool, address, string, uint, uint, bytes32, string) {
         require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
         return(listing.available, listing.seller, listing.name, listing.price, listing.index, listing.escrowHash, listing.deliveryInformation);
     }
 
-    function getListingCount() public view returns (uint) {
+    function getListingCount() external view returns (uint) {
         return listingIndex.length;
     }
 
-    function getUserListingCount(address user) public view returns (uint) {
+    function getUserListingCount(address user) external view returns (uint) {
         return listingsByUser[user].length;
     }
 
-    function getListingIndexForUserByIndex(address user, uint index) public view returns (uint) {
+    function getListingIndexForUserByIndex(address user, uint index) external view returns (uint) {
         require(index < listingsByUser[user].length);
         return listingsByUser[user][index];
     }
 
-    function getUserOrderCount(address user) public view returns (uint) {
+    function getUserOrderCount(address user) external view returns (uint) {
         return ordersByUser[user].length;
     }
 
-    function getListingIndexForUserOrderByIndex(address user, uint index) public view returns (uint) {
+    function getListingIndexForUserOrderByIndex(address user, uint index) external view returns (uint) {
         require(index < ordersByUser[user].length);
         return ordersByUser[user][index];
     }
 
-    function addListing(string name, uint price) public returns (bytes32 listingHash){
+    function addListing(string name, uint price) external returns (bytes32 listingHash){
         listingHash = keccak256(msg.sender, name, price, now);
         insertListing(listingHash, msg.sender, name, price);
         return listingHash;
     }
 
-    function purchaseListing(bytes32 listingHash, string deliveryInformation) payable public returns (bytes32 escrowHash) {
+    function purchaseListing(bytes32 listingHash, string deliveryInformation) payable external returns (bytes32 escrowHash) {
         require(isListing(listingHash));
         Listing storage listing = listings[listingHash];
         require(listing.available);
@@ -117,7 +116,6 @@ contract MarketplaceAgent {
         listing.escrowHash = escrowHash;
         listing.deliveryInformation = deliveryInformation;
         listing.available = false;
-        ListingPurchased(listingHash, deliveryInformation);
         ordersByUser[msg.sender].push(listing.index);
         return escrowHash;
     }

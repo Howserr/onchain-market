@@ -131,7 +131,7 @@ contract('given an escrow agent contract', function (accounts) {
 					value: web3.toWei(0.01, "ether")
 				})
 				escrowHash = transactionHash.logs[0].args.escrowHash
-			})
+			});
 
 			describe('by the buyer', function () {
 				it('then set buyerApproved to true', async function () {
@@ -139,28 +139,8 @@ contract('given an escrow agent contract', function (accounts) {
 					const result = await escrowAgent.getEscrow.call(escrowHash)
 
 					assert.isTrue(result[4])
-				})
-
-				it('then emit BuyerApproved event', async function () {
-					let transactionHash = await escrowAgent.approve(escrowHash, {from: buyer})
-
-					assert.equal(transactionHash.logs[0].event, "BuyerApproved")
-				})
-
-				it('then emit BuyerApproved event with the escrow hash', async function () {
-					let transactionHash = await escrowAgent.approve(escrowHash, {from: buyer})
-
-					assert.equal(escrowHash, transactionHash.logs[0].args.escrowHash)
-				})
-
-				it('then emit BuyerApproved event with the buyers address', async function () {
-					let transactionHash = await escrowAgent.approve(escrowHash, {from: buyer})
-					let approvalAddress = transactionHash.logs[0].args.approvedFrom
-
-					const escrow = await escrowAgent.getEscrow.call(escrowHash)
-					assert.equal(approvalAddress, escrow[2])
-				})
-			})
+				});
+			});
 
 			describe('by the seller', function () {
 				it('then set sellerApproved to true', async function () {
@@ -168,28 +148,8 @@ contract('given an escrow agent contract', function (accounts) {
 					const result = await escrowAgent.getEscrow.call(escrowHash)
 
 					assert.isTrue(result[5])
-				})
-
-				it('then emit SellerApproved event', async function () {
-					let transactionHash = await escrowAgent.approve(escrowHash, {from: seller})
-
-					assert.equal(transactionHash.logs[0].event, "SellerApproved")
-				})
-
-				it('then emit SellerApproved event with the escrow hash', async function () {
-					let transactionHash = await escrowAgent.approve(escrowHash, {from: seller})
-
-					assert.equal(escrowHash, transactionHash.logs[0].args.escrowHash)
-				})
-
-				it('then emit SellerApproved event with the sellers address', async function () {
-					let transactionHash = await escrowAgent.approve(escrowHash, {from: seller})
-					let approvalAddress = transactionHash.logs[0].args.approvedFrom
-
-					const escrow = await escrowAgent.getEscrow.call(escrowHash)
-					assert.equal(approvalAddress, escrow[1])
-				})
-			})
+				});
+			});
 
 			describe('by an invalid address', function () {
 				it('then it should throw', async function () {
@@ -211,7 +171,7 @@ contract('given an escrow agent contract', function (accounts) {
 					assert.equal(result[4], escrow[4])
 					assert.equal(result[5], escrow[5])
 				})
-			})
+			});
 
 			describe('and both buyer and seller have now approved', function () {
 				beforeEach('approve from both buyer and seller', async function () {
@@ -234,7 +194,7 @@ contract('given an escrow agent contract', function (accounts) {
 						assert.equal(result[0].args.value, web3.toWei(0.01, "ether"))
 					})
 				})
-			})
+			});
 		});
 	});
 
@@ -493,12 +453,6 @@ contract('given an escrow agent contract', function (accounts) {
 						let transactionHash = await escrowAgent.arbitrate(escrowHash, seller, {from: arbitrator})
 
 						assert.equal(transactionHash.logs[0].event, "PaidOut")
-					});
-
-					it('then a DisputeResolved event is emitted', async function () {
-						let transactionHash = await escrowAgent.arbitrate(escrowHash, seller, {from: arbitrator})
-
-						assert.equal(transactionHash.logs[1].event, "DisputeResolved")
 					});
 				});
 			})
