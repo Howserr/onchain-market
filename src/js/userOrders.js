@@ -10,7 +10,6 @@ App.waitAndRefreshUser = function (count) {
 		for (let i = 0; i < count; i++) {
 			let listing = App.userOrders[i];
 			res = res + "<tr>";
-			res = res + "<td>" + listing[0] + "</td>";
 			res = res + "<td><a href='listing.html?listingIndex=" + listing[4] + "'>" + listing[2] + "</a></td>";
 			res = res + "<td>" + web3.fromWei(listing[3], "ether") + " ETH" + "</td>";
 			res = res + "</tr>";
